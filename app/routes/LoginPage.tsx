@@ -26,7 +26,7 @@ export default function LoginPage() {
       } = response.data;
 
       // Save token in localStorage or context
-      localStorage.setItem("token", `${tokenType} ${accessToken}`);
+      localStorage.setItem("token", accessToken);
       localStorage.setItem("username", usernameResponse);
       const roles = authorities.map(
         (auth: { authority: string }) => auth.authority

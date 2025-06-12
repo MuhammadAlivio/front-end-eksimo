@@ -3,7 +3,7 @@ import axios from "axios";
 import { ShoppingCart, User, ShoppingBag } from "lucide-react";
 
 export default function HomePage() {
-  const [products, setProducts] = useState([]);
+  const [products, setProducts] = useState<any[]>([]);
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -58,7 +58,7 @@ export default function HomePage() {
             <div key={product.id} className="text-center">
               <div className="mb-6">
                 <img
-                  src={product.images?.[0] || "/placeholder.jpg"}
+                  src={product.image || "/placeholder.jpg"}
                   alt={product.name}
                   className="w-full h-auto rounded-lg shadow-sm"
                 />

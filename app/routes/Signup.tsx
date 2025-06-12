@@ -15,11 +15,11 @@ export default function SignupPage() {
       const response = await axios.post(
         "http://localhost:8080/api/customer/register",
         {
-          username: email,
-          password,
-          name: username,
-          address,
-          phoneNumber: phone,
+            username: email,
+            password,
+            name: username,
+            address,
+            phoneNumber: phone,
         }
       );
 
