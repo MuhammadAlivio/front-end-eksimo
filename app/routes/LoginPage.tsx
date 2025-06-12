@@ -57,7 +57,7 @@ export default function LoginPage() {
               htmlFor="username"
               className="mb-1 block text-xs uppercase tracking-wide text-[#666]"
             >
-              Username
+              Email
             </label>
             <input
               id="username"
