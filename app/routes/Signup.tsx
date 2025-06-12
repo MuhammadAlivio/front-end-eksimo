@@ -1,17 +1,50 @@
+import { useState } from "react";
+import axios from "axios";
+
 export default function SignupPage() {
+  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+
+  const handleSignup = async () => {
+    try {
+      const response = await axios.post("http://localhost:8080/api/customer/register", {
+        email,
+        username,
+        password
+      });
+
+      setSuccess("Account created successfully! You can now log in.");
+      setError("");
+
+      // Optionally redirect:
+      setTimeout(() => {
+        window.location.href = "/login";
+      }, 2000);
+    } catch (err: any) {
+      setError(err.response?.data || "Registration failed.");
+      setSuccess("");
+    }
+  };
+
   return (
     <div className="flex h-screen w-full bg-[#fdf6e3]">
-      {/* Left side - Illustration */}
+      {/* Left - Illustration */}
       <div className="flex w-1/2 items-center justify-center bg-[#69b9e7] rounded-r-3xl">
-      <div className="relative mx-auto">
-            <img src="/rumah-eskimo.png" alt="rumah eskimo" className="object-contain h-[500px] w-[625px]" />
-          </div>
+        <div className="relative mx-auto">
+          <img src="/rumah-eskimo.png" alt="rumah eskimo" className="object-contain h-[500px] w-[625px]" />
+        </div>
       </div>
 
-      {/* Right side - Signup Form */}
+      {/* Right - Signup Form */}
       <div className="flex w-1/2 items-center justify-center bg-[#f5f5f5]">
         <div className="w-[400px] max-w-[80%]">
           <h1 className="mb-10 text-3xl font-bold text-[#111]">CREATE ACCOUNT</h1>
+
+          {error && <div className="mb-4 text-sm text-red-600">{error}</div>}
+          {success && <div className="mb-4 text-sm text-green-600">{success}</div>}
 
           <div className="mb-6">
             <label htmlFor="email" className="mb-1 block text-xs uppercase tracking-wide text-[#666]">
@@ -20,6 +53,8 @@ export default function SignupPage() {
             <input
               id="email"
               type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               className="w-full rounded-md border border-[#ccc] bg-transparent px-4 py-3 focus:border-[#0099ff] focus:outline-none text-black"
             />
           </div>
@@ -31,6 +66,8 @@ export default function SignupPage() {
             <input
               id="username"
               type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
               className="w-full rounded-md border border-[#ccc] bg-transparent px-4 py-3 focus:border-[#0099ff] focus:outline-none text-black"
             />
           </div>
@@ -42,18 +79,23 @@ export default function SignupPage() {
             <input
               id="password"
               type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               className="w-full rounded-md border border-[#ccc] bg-transparent px-4 py-3 focus:border-[#0099ff] focus:outline-none text-black"
             />
           </div>
 
-          <button className="mb-4 w-full rounded-lg bg-[#0099ff] py-3 text-center font-medium text-white transition-colors hover:bg-[#0088ee]">
+          <button
+            onClick={handleSignup}
+            className="mb-4 w-full rounded-lg bg-[#0099ff] py-3 text-center font-medium text-white transition-colors hover:bg-[#0088ee]"
+          >
             CREATE ACCOUNT
           </button>
 
           <div className="text-center">
             <p className="text-gray-600">
               Already Have An Account?{" "}
-              <a href="/login" className="text-blue-500 hover:text-blue-600 font-medium">
+              <a href="/" className="text-blue-500 hover:text-blue-600 font-medium">
                 Login
               </a>
             </p>
@@ -61,5 +103,5 @@ export default function SignupPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }
