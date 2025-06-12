@@ -4,55 +4,75 @@ import { useState } from "react";
 import axios from "axios";
 
 export default function LoginPage() {
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
+  // ...existing code...
   const handleLogin = async () => {
     try {
-      const response = await axios.post("http://localhost:8080/api/auth/login", {
-        email,
-        password,
-      });
-
-      const { accessToken, tokenType, username, authorities } = response.data;
+      const response = await axios.post(
+        "http://localhost:8080/api/auth/login",
+        {
+          username,
+          password,
+        }
+      );
+      const {
+        accessToken,
+        tokenType,
+        username: usernameResponse,
+        authorities,
+      } = response.data;
 
       // Save token in localStorage or context
       localStorage.setItem("token", `${tokenType} ${accessToken}`);
-      localStorage.setItem("username", username);
+      localStorage.setItem("username", usernameResponse);
 
       // Navigate or update state (you may use react-router-dom)
       window.location.href = "/homepage";
-
-    } catch (err) {
-      setError("Invalid email or password");
-      console.error("Login failed:", err);
+    } catch (err: any) {
+      setError(err.response?.data?.message || "Invalid email or password");
+      if (err.response) {
+        console.error("Login failed:", err.response.data);
+      } else {
+        console.error("Login failed:", err.message || err);
+      }
     }
   };
+  // ...existing code...
 
   return (
     <div className="flex h-screen w-full bg-[#fdf6e3]">
       <div className="flex w-1/2 items-center justify-center bg-[#fdf6e3]">
         <div className="w-[400px] max-w-[80%]">
-          <h1 className="mb-10 text-3xl font-bold text-[#111]">Let&apos;s Get Started</h1>
+          <h1 className="mb-10 text-3xl font-bold text-[#111]">
+            Let&apos;s Get Started
+          </h1>
 
           {error && <div className="mb-4 text-sm text-red-600">{error}</div>}
 
           <div className="mb-6">
-            <label htmlFor="email" className="mb-1 block text-xs uppercase tracking-wide text-[#666]">
-              Email
+            <label
+              htmlFor="username"
+              className="mb-1 block text-xs uppercase tracking-wide text-[#666]"
+            >
+              Username
             </label>
             <input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              id="username"
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
               className="w-full rounded-md border border-[#ccc] bg-transparent px-4 py-3 focus:border-[#0099ff] focus:outline-none text-black"
             />
           </div>
 
           <div className="mb-8">
-            <label htmlFor="password" className="mb-1 block text-xs uppercase tracking-wide text-[#666]">
+            <label
+              htmlFor="password"
+              className="mb-1 block text-xs uppercase tracking-wide text-[#666]"
+            >
               Password
             </label>
             <input
@@ -71,7 +91,6 @@ export default function LoginPage() {
             LOGIN
           </button>
 
-
           <div>
             <a href="#" className="text-sm text-[#666] hover:text-[#0099ff]">
               Forget Your Password?
@@ -80,9 +99,12 @@ export default function LoginPage() {
 
           <div>
             <p className="text-gray-600">
-              Already have an account? {" "}
-              <a href="signup" className="text-blue-500 hover:text-blue-600 font-medium">
-                Register 
+              Already have an account?{" "}
+              <a
+                href="signup"
+                className="text-blue-500 hover:text-blue-600 font-medium"
+              >
+                Register
               </a>
             </p>
           </div>
@@ -91,7 +113,11 @@ export default function LoginPage() {
 
       <div className="flex w-1/2 items-center justify-center bg-[#69b9e7] rounded-l-3xl">
         <div className="relative mx-auto">
-          <img src="/club-character.png" alt="Club character" className="object-contain h-[500px] w-[625px]" />
+          <img
+            src="/club-character.png"
+            alt="Club character"
+            className="object-contain h-[500px] w-[625px]"
+          />
         </div>
       </div>
     </div>
