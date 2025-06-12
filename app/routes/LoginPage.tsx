@@ -28,9 +28,16 @@ export default function LoginPage() {
       // Save token in localStorage or context
       localStorage.setItem("token", `${tokenType} ${accessToken}`);
       localStorage.setItem("username", usernameResponse);
-
-      // Navigate or update state (you may use react-router-dom)
-      window.location.href = "/homepage";
+      const roles = authorities.map(
+        (auth: { authority: string }) => auth.authority
+      );
+      if (roles.includes("ROLE_ADMIN")) {
+        window.location.href = "/admin";
+      } else if (roles.includes("ROLE_CUSTOMER")) {
+        window.location.href = "/homepage";
+      } else {
+        setError("Unknown role. Cannot redirect.");
+      }
     } catch (err: any) {
       setError(err.response?.data?.message || "Invalid email or password");
       if (err.response) {

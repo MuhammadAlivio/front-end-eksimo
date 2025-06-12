@@ -8,7 +8,7 @@ export default function HomePage() {
 
   useEffect(() => {
     const fetchProducts = async () => {
-      const token = localStorage.getItem("accessToken");
+      const token = localStorage.getItem("token");
       if (!token) {
         setError("Unauthorized: No access token");
         return;
