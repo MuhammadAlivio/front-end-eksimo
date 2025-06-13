@@ -69,51 +69,66 @@ export default function AddOrEditProduct() {
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const token = localStorage.getItem("token");
+  e.preventDefault();
+  const token = localStorage.getItem("token");
 
-    if (isEdit) {
-      // Edit: Kirim data sebagai JSON (tanpa multipart), image hanya string
-      await axios.put(
-        `http://localhost:8080/api/admin/products/${productId}`,
-        {
+  // Validasi image wajib diisi saat add
+  if (!isEdit && !form.image) {
+    alert("Image is required");
+    return;
+  }
+
+  const data = new FormData();
+  data.append(
+    "product",
+    new Blob(
+      [
+        JSON.stringify({
           name: form.name,
           description: form.description,
           price: Number(form.price),
           stock: Number(form.stock),
           categoryId: Number(form.categoryId),
-          image: form.image ? form.image.name : form.imageUrl || "", // kirim nama file atau url lama
-        },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      // Jika ingin support update gambar di backend, perlu endpoint khusus multipart.
-    } else {
-      // Add: Kirim multipart (product JSON + file image)
-      const data = new FormData();
-      data.append(
-        "product",
-        new Blob(
-          [
-            JSON.stringify({
-              name: form.name,
-              description: form.description,
-              price: Number(form.price),
-              stock: Number(form.stock),
-              categoryId: Number(form.categoryId),
-              image: "", // backend handle file
-            }),
-          ],
-          { type: "application/json" }
-        )
-      );
-      if (form.image) data.append("image", form.image);
+          image: "", // backend akan handle file image
+        }),
+      ],
+      { type: "application/json" }
+    )
+  );
+  if (form.image) data.append("image", form.image);
 
+  try {
+    if (isEdit && productId) {
+      // UPDATE
+      await axios.put(
+        `http://localhost:8080/api/admin/products/${productId}`,
+        data,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+    } else {
+      // ADD
       await axios.post("http://localhost:8080/api/admin/products", data, {
-        headers: { Authorization: `Bearer ${token}` },
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
     }
     window.location.href = "/admin";
-  };
+  } catch (err: any) {
+    console.error(
+      isEdit ? "Failed to update product:" : "Failed to add product:",
+      err.response?.data || err.message
+    );
+    alert(
+      err.response?.data?.message ||
+        (isEdit ? "Failed to update product" : "Failed to add product")
+    );
+  }
+};
 
   return (
     <div className="max-w-xl mx-auto p-6 bg-white rounded shadow mt-8">
