@@ -74,15 +74,26 @@ export default function Component() {
     fetchOrders();
   }, []);
 
-  // Dummy updateProductQuantity, sesuaikan dengan kebutuhan Anda
-  const updateProductQuantity = (productId: number, delta: number) => {
-    setProducts((prev) =>
-      prev.map((p) =>
-        p.id === productId
-          ? { ...p, stock: Math.max(0, (p.stock || 0) + delta) }
-          : p
-      )
-    );
+  // Pindahkan handleDeleteProduct ke sini!
+  const handleDeleteProduct = async (productId: number) => {
+    if (!window.confirm("Are you sure you want to delete this product?"))
+      return;
+    const token = localStorage.getItem("token");
+    try {
+      await axios.delete(
+        `http://localhost:8080/api/admin/products/${productId}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      setProducts((prev) => prev.filter((p) => p.id !== productId));
+      alert("Product deleted successfully");
+    } catch (err: any) {
+      alert(
+        "Failed to delete product: " +
+          (err.response?.data?.message || err.message)
+      );
+    }
   };
 
   return (
@@ -165,33 +176,24 @@ export default function Component() {
                   <div className="text-center font-medium text-gray-900">
                     {formatPrice(product.price)}
                   </div>
-                  {/* Stock Controls */}
-                  <div className="flex items-center justify-center space-x-2">
-                    <button
-                      onClick={() => updateProductQuantity(product.id, -1)}
-                      className="w-8 h-8 border border-gray-300 rounded flex items-center justify-center hover:bg-gray-50"
-                    >
-                      <Minus className="w-4 h-4" />
-                    </button>
-                    <input
-                      type="number"
-                      value={product.stock}
-                      onChange={(e) => {
-                        const newStock = Number.parseInt(e.target.value) || 0;
-                        setProducts((prev) =>
-                          prev.map((p) =>
-                            p.id === product.id ? { ...p, stock: newStock } : p
-                          )
-                        );
-                      }}
-                      className="w-12 h-8 text-center border border-gray-300 rounded"
-                    />
-                    <button
-                      onClick={() => updateProductQuantity(product.id, 1)}
-                      className="w-8 h-8 border border-gray-300 rounded flex items-center justify-center hover:bg-gray-50"
-                    >
-                      <Plus className="w-4 h-4" />
-                    </button>
+                  {/* Stock Info */}
+                  <div className="flex flex-col items-center justify-center">
+                    <span className="font-semibold text-lg">
+                      {product.stock}
+                    </span>
+                    {product.stock > 10 ? (
+                      <span className="mt-1 px-2 py-0.5 text-xs rounded bg-green-100 text-green-700 font-semibold">
+                        In Stock
+                      </span>
+                    ) : product.stock > 0 ? (
+                      <span className="mt-1 px-2 py-0.5 text-xs rounded bg-yellow-100 text-yellow-700 font-semibold">
+                        Low Stock
+                      </span>
+                    ) : (
+                      <span className="mt-1 px-2 py-0.5 text-xs rounded bg-red-100 text-red-700 font-semibold">
+                        Out of Stock
+                      </span>
+                    )}
                   </div>
                   {/* Actions */}
                   <div className="flex items-center justify-center space-x-2">
@@ -208,6 +210,7 @@ export default function Component() {
                       variant="outline"
                       size="sm"
                       className="text-red-600 hover:text-red-700"
+                      onClick={() => handleDeleteProduct(product.id)}
                     >
                       Delete
                     </Button>
