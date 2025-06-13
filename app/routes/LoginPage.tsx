@@ -1,4 +1,4 @@
-import type { Route } from "./+types/LoginPage";
+// import type { Route } from "./+types/LoginPage";
 import { Welcome } from "../welcome/welcome";
 import { useState } from "react";
 import axios from "axios";

@@ -133,6 +133,16 @@ export default function Component() {
               <div className="font-medium text-center">Actions</div>
             </div>
           </div>
+          {/* Button add product */}
+          <div className="flex items-center justify-between bg-blue-300 text-white p-4">
+            <div className="font-medium text-lg">Product List</div>
+            <button
+              className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded"
+              onClick={() => (window.location.href = "/product")}
+            >
+              + Add Product
+            </button>
+          </div>
           {/* Products List */}
           <div className="divide-y divide-gray-200">
             {products.map((product) => (
@@ -147,7 +157,9 @@ export default function Component() {
                         className="object-cover"
                       />
                     </div>
-                    <span className="font-medium text-gray-900">{product.name}</span>
+                    <span className="font-medium text-gray-900">
+                      {product.name}
+                    </span>
                   </div>
                   {/* Price */}
                   <div className="text-center font-medium text-gray-900">
@@ -183,10 +195,20 @@ export default function Component() {
                   </div>
                   {/* Actions */}
                   <div className="flex items-center justify-center space-x-2">
-                    <Button variant="outline" size="sm">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() =>
+                        (window.location.href = `/product/${product.id}`)
+                      }
+                    >
                       Edit
                     </Button>
-                    <Button variant="outline" size="sm" className="text-red-600 hover:text-red-700">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="text-red-600 hover:text-red-700"
+                    >
                       Delete
                     </Button>
                   </div>
@@ -217,7 +239,11 @@ export default function Component() {
                   <div>{order.username}</div>
                   <div>{order.status}</div>
                   <div>{formatPrice(order.totalPrice)}</div>
-                  <div>{order.orderDate ? new Date(order.orderDate).toLocaleString() : ""}</div>
+                  <div>
+                    {order.orderDate
+                      ? new Date(order.orderDate).toLocaleString()
+                      : ""}
+                  </div>
                 </div>
               </div>
             ))}
