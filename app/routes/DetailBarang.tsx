@@ -58,7 +58,7 @@ export default function Component() {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-      alert("Produk berhasil ditambahkan ke cart!");
+      window.location.href = "/cart";
     } catch (err: any) {
       alert(err.response?.data?.message || "Gagal menambahkan ke cart");
     }
@@ -69,6 +69,11 @@ export default function Component() {
 
   return (
     <div className="min-h-screen bg-gray-50 p-4 md:p-8">
+      <button className="absolute top-6 right-6 z-10 text-3xl text-gray-400 hover:text-gray-700 font-bold focus:outline-none" aria-label="Close" style={{ background: "none", border: "none" }}>
+        <a href="/homepage" className="no-underline text-inherit">
+          &times;
+        </a>
+      </button>
       <div className="max-w-6xl mx-auto bg-white rounded-2xl shadow-lg overflow-hidden">
         <div className="grid md:grid-cols-2 gap-8">
           {/* Product Image */}
