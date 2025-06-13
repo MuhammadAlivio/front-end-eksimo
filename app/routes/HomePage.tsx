@@ -37,12 +37,20 @@ export default function HomePage() {
         <div className="flex items-center justify-between max-w-7xl mx-auto">
           <h1 className="text-white text-2xl font-light">The Club Eskimo</h1>
           <nav className="hidden md:flex items-center space-x-8">
-            <a href="#" className="text-white hover:text-gray-100 transition-colors">New release</a>
-            <a href="#" className="text-white hover:text-gray-100 transition-colors">Latest release</a>
-            <a href="#" className="text-white hover:text-gray-100 transition-colors">Categories</a>
+            <a href="#" className="text-white hover:text-gray-100 transition-colors">
+              New release
+            </a>
+            <a href="#" className="text-white hover:text-gray-100 transition-colors">
+              Latest release
+            </a>
+            <a href="#" className="text-white hover:text-gray-100 transition-colors">
+              Categories
+            </a>
           </nav>
           <div className="flex items-center space-x-4">
-            <ShoppingCart className="text-white w-6 h-6" />
+            <a href="/cart">
+              <ShoppingCart className="text-white w-6 h-6 cursor-pointer" />
+            </a>
             <User className="text-white w-6 h-6" />
             <ShoppingBag className="text-white w-6 h-6" />
           </div>
@@ -57,11 +65,7 @@ export default function HomePage() {
           {products.map((product: any) => (
             <div key={product.id} className="text-center">
               <div className="mb-6">
-                <img
-                  src={product.image || "/placeholder.jpg"}
-                  alt={product.name}
-                  className="w-full h-auto rounded-lg shadow-sm"
-                />
+                <img src={product.image || "/placeholder.jpg"} alt={product.name} className="w-full h-auto rounded-lg shadow-sm" />
               </div>
               <h2 className="text-xl font-normal text-gray-800">{product.name}</h2>
               <p className="text-gray-600 text-sm">Rp {product.price.toLocaleString()}</p>

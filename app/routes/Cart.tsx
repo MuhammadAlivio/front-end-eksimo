@@ -1,26 +1,69 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { ArrowLeft, Check } from "lucide-react"
-import { Button } from "../components/ui/button"
+import { useEffect, useState } from "react";
+import axios from "axios";
+import { ArrowLeft, Check } from "lucide-react";
+import { Button } from "../components/ui/button";
+
+interface CartItem {
+  cartItemId: number;
+  productId: number;
+  productName: string;
+  productImageUrl: string;
+  quantity: number;
+  pricePerUnit: number;
+  subtotal: number;
+}
+
+interface CartResponse {
+  cartId: number;
+  items: CartItem[];
+  totalUniqueItems: number;
+  totalItemUnits: number;
+  grandTotal: number;
+}
 
 export default function Component() {
-  const [shippingMode, setShippingMode] = useState("store-pickup")
+  const [shippingMode, setShippingMode] = useState("store-pickup");
+  const [cart, setCart] = useState<CartResponse | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-  // Sample cart data - empty for now as shown in image
-  const cartItems: any = []
+  useEffect(() => {
+    const fetchCart = async () => {
+      setLoading(true);
+      setError("");
+      const token = localStorage.getItem("token");
+      if (!token) {
+        setError("Unauthorized: No access token");
+        setLoading(false);
+        return;
+      }
+      try {
+        const response = await axios.get("http://localhost:8080/api/customer/cart", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setCart(response.data);
+      } catch (err: any) {
+        setError(err.response?.data?.message || "Failed to fetch cart");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchCart();
+  }, []);
 
-  const subtotal = 0
-  const shippingCost = shippingMode === "store-pickup" ? 0 : 25000
-  const total = subtotal + shippingCost
+  const subtotal = cart?.grandTotal || 0;
+  const shippingCost = shippingMode === "store-pickup" ? 0 : 25000;
+  const total = subtotal + shippingCost;
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("id-ID", {
       style: "currency",
       currency: "IDR",
       minimumFractionDigits: 0,
-    }).format(price)
-  }
+    }).format(price);
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 p-4 md:p-8">
@@ -46,17 +89,27 @@ export default function Component() {
 
           {/* Cart Items */}
           <div className="p-6">
-            {cartItems.length === 0 ? (
+            {loading ? (
+              <div className="text-center py-12 text-gray-500">Loading...</div>
+            ) : error ? (
+              <div className="text-center py-12 text-red-500">{error}</div>
+            ) : cart && cart.items.length > 0 ? (
+              cart.items.map((item) => (
+                <div key={item.cartItemId} className="grid grid-cols-4 gap-4 py-4 border-b border-gray-100 last:border-b-0 items-center">
+                  <div className="flex items-center space-x-4">
+                    <img src={item.productImageUrl || "/placeholder.jpg"} alt={item.productName} className="w-16 h-16 object-cover rounded" />
+                    <span className="font-medium text-gray-900">{item.productName}</span>
+                  </div>
+                  <div className="text-center text-gray-700">{formatPrice(item.pricePerUnit)}</div>
+                  <div className="text-center text-gray-700">{item.quantity}</div>
+                  <div className="text-right text-gray-900 font-semibold">{formatPrice(item.subtotal)}</div>
+                </div>
+              ))
+            ) : (
               <div className="text-center py-12 text-gray-500">
                 <p className="text-lg">Your cart is empty</p>
                 <p className="text-sm mt-2">Add some items to get started</p>
               </div>
-            ) : (
-              cartItems.map((item: any, index: any) => (
-                <div key={index} className="grid grid-cols-4 gap-4 py-4 border-b border-gray-100 last:border-b-0">
-                  {/* Product details would go here */}
-                </div>
-              ))
             )}
           </div>
         </div>
@@ -72,19 +125,8 @@ export default function Component() {
                 {/* Store Pickup */}
                 <label className="flex items-center cursor-pointer">
                   <div className="relative">
-                    <input
-                      type="radio"
-                      name="shipping"
-                      value="store-pickup"
-                      checked={shippingMode === "store-pickup"}
-                      onChange={(e) => setShippingMode(e.target.value)}
-                      className="sr-only"
-                    />
-                    <div
-                      className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
-                        shippingMode === "store-pickup" ? "bg-red-500 border-red-500" : "border-gray-400"
-                      }`}
-                    >
+                    <input type="radio" name="shipping" value="store-pickup" checked={shippingMode === "store-pickup"} onChange={(e) => setShippingMode(e.target.value)} className="sr-only" />
+                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${shippingMode === "store-pickup" ? "bg-red-500 border-red-500" : "border-gray-400"}`}>
                       {shippingMode === "store-pickup" && <Check className="w-3 h-3 text-white" />}
                     </div>
                   </div>
@@ -96,19 +138,8 @@ export default function Component() {
                 {/* Home Delivery */}
                 <label className="flex items-center cursor-pointer">
                   <div className="relative">
-                    <input
-                      type="radio"
-                      name="shipping"
-                      value="home-delivery"
-                      checked={shippingMode === "home-delivery"}
-                      onChange={(e) => setShippingMode(e.target.value)}
-                      className="sr-only"
-                    />
-                    <div
-                      className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
-                        shippingMode === "home-delivery" ? "bg-red-500 border-red-500" : "border-gray-400"
-                      }`}
-                    >
+                    <input type="radio" name="shipping" value="home-delivery" checked={shippingMode === "home-delivery"} onChange={(e) => setShippingMode(e.target.value)} className="sr-only" />
+                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${shippingMode === "home-delivery" ? "bg-red-500 border-red-500" : "border-gray-400"}`}>
                       {shippingMode === "home-delivery" && <Check className="w-3 h-3 text-white" />}
                     </div>
                   </div>
@@ -128,9 +159,7 @@ export default function Component() {
 
               <div className="flex justify-between items-center">
                 <span className="text-sm font-medium text-gray-500 uppercase tracking-wide">SHIPPING</span>
-                <span className="font-medium text-gray-900">
-                  {shippingMode === "store-pickup" ? "FREE" : formatPrice(shippingCost)}
-                </span>
+                <span className="font-medium text-gray-900">{shippingMode === "store-pickup" ? "FREE" : formatPrice(shippingCost)}</span>
               </div>
 
               <hr className="border-gray-300" />
@@ -148,5 +177,5 @@ export default function Component() {
         </div>
       </div>
     </div>
-  )
+  );
 }
