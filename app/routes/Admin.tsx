@@ -1,0 +1,229 @@
+import { useState, useEffect } from "react";
+import { ShoppingBag, ShoppingCart, User, Plus, Minus } from "lucide-react";
+import { Button } from "../components/ui/button";
+import axios from "axios";
+
+interface Product {
+  id: number;
+  name: string;
+  price: number;
+  stock: number;
+  image: string;
+  description: string;
+  category: {
+    id: number;
+    name: string;
+  };
+  averageRating: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface OrderAdmin {
+  orderId: number;
+  customerName: string;
+  username: string;
+  status: string;
+  totalPrice: number;
+  totalAmount: number;
+  orderDate: string;
+}
+
+function formatPrice(price: number) {
+  return price.toLocaleString("id-ID", { style: "currency", currency: "IDR" });
+}
+
+export default function Component() {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [orders, setOrders] = useState<OrderAdmin[]>([]);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const response = await axios.get(
+          "http://localhost:8080/api/admin/products",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        setProducts(response.data.products);
+      } catch (err: any) {
+        console.error("Failed to fetch products:", err);
+      }
+    };
+
+    const fetchOrders = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const response = await axios.get(
+          "http://localhost:8080/api/admin/orders",
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+        setOrders(response.data);
+      } catch (err) {
+        console.error("Failed to fetch orders:", err);
+      }
+    };
+
+    fetchProducts();
+    fetchOrders();
+  }, []);
+
+  // Dummy updateProductQuantity, sesuaikan dengan kebutuhan Anda
+  const updateProductQuantity = (productId: number, delta: number) => {
+    setProducts((prev) =>
+      prev.map((p) =>
+        p.id === productId
+          ? { ...p, stock: Math.max(0, (p.stock || 0) + delta) }
+          : p
+      )
+    );
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <header className="bg-blue-400 text-white p-4">
+        <div className="max-w-7xl mx-auto flex items-center justify-between">
+          {/* Logo and Title */}
+          <div className="flex items-center space-x-3">
+            <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center">
+              <span className="text-blue-400 font-bold text-sm">A</span>
+            </div>
+            <div>
+              <h1 className="text-xl font-bold">Admin</h1>
+              <p className="text-sm opacity-90">The Club Eskimo</p>
+            </div>
+          </div>
+          {/* Navigation */}
+          <nav className="hidden md:flex items-center space-x-8">
+            <a href="#" className="hover:opacity-80 transition-opacity">
+              New release
+            </a>
+            <a href="#" className="hover:opacity-80 transition-opacity">
+              Latest release
+            </a>
+            <a href="#" className="hover:opacity-80 transition-opacity">
+              Categories
+            </a>
+          </nav>
+          {/* Icons */}
+          <div className="flex items-center space-x-4">
+            <ShoppingBag className="w-6 h-6 cursor-pointer hover:opacity-80" />
+            <ShoppingCart className="w-6 h-6 cursor-pointer hover:opacity-80" />
+            <User className="w-6 h-6 cursor-pointer hover:opacity-80" />
+          </div>
+        </div>
+      </header>
+
+      <div className="max-w-7xl mx-auto p-6 space-y-8">
+        {/* Products Section */}
+        <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+          {/* Products Header */}
+          <div className="bg-blue-300 text-white p-4">
+            <div className="grid grid-cols-4 gap-4">
+              <div className="font-medium">Product Name</div>
+              <div className="font-medium text-center">Price</div>
+              <div className="font-medium text-center">Stock</div>
+              <div className="font-medium text-center">Actions</div>
+            </div>
+          </div>
+          {/* Products List */}
+          <div className="divide-y divide-gray-200">
+            {products.map((product) => (
+              <div key={product.id} className="p-4">
+                <div className="grid grid-cols-4 gap-4 items-center">
+                  {/* Product Info */}
+                  <div className="flex items-center space-x-3">
+                    <div className="w-16 h-16 relative rounded-lg overflow-hidden bg-gray-100">
+                      <img
+                        src={product.image || "/placeholder.svg"}
+                        alt={product.name}
+                        className="object-cover"
+                      />
+                    </div>
+                    <span className="font-medium text-gray-900">{product.name}</span>
+                  </div>
+                  {/* Price */}
+                  <div className="text-center font-medium text-gray-900">
+                    {formatPrice(product.price)}
+                  </div>
+                  {/* Stock Controls */}
+                  <div className="flex items-center justify-center space-x-2">
+                    <button
+                      onClick={() => updateProductQuantity(product.id, -1)}
+                      className="w-8 h-8 border border-gray-300 rounded flex items-center justify-center hover:bg-gray-50"
+                    >
+                      <Minus className="w-4 h-4" />
+                    </button>
+                    <input
+                      type="number"
+                      value={product.stock}
+                      onChange={(e) => {
+                        const newStock = Number.parseInt(e.target.value) || 0;
+                        setProducts((prev) =>
+                          prev.map((p) =>
+                            p.id === product.id ? { ...p, stock: newStock } : p
+                          )
+                        );
+                      }}
+                      className="w-12 h-8 text-center border border-gray-300 rounded"
+                    />
+                    <button
+                      onClick={() => updateProductQuantity(product.id, 1)}
+                      className="w-8 h-8 border border-gray-300 rounded flex items-center justify-center hover:bg-gray-50"
+                    >
+                      <Plus className="w-4 h-4" />
+                    </button>
+                  </div>
+                  {/* Actions */}
+                  <div className="flex items-center justify-center space-x-2">
+                    <Button variant="outline" size="sm">
+                      Edit
+                    </Button>
+                    <Button variant="outline" size="sm" className="text-red-600 hover:text-red-700">
+                      Delete
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Orders Section */}
+        <div className="bg-white rounded-lg shadow-sm overflow-hidden mt-8">
+          <div className="bg-blue-300 text-white p-4">
+            <div className="grid grid-cols-6 gap-4">
+              <div className="font-medium">Order ID</div>
+              <div className="font-medium">Customer Name</div>
+              <div className="font-medium">Username</div>
+              <div className="font-medium">Status</div>
+              <div className="font-medium">Total Price</div>
+              <div className="font-medium">Order Date</div>
+            </div>
+          </div>
+          <div className="divide-y divide-gray-200">
+            {orders.map((order) => (
+              <div key={order.orderId} className="p-4">
+                <div className="grid grid-cols-6 gap-4 items-center">
+                  <div>{order.orderId}</div>
+                  <div>{order.customerName}</div>
+                  <div>{order.username}</div>
+                  <div>{order.status}</div>
+                  <div>{formatPrice(order.totalPrice)}</div>
+                  <div>{order.orderDate ? new Date(order.orderDate).toLocaleString() : ""}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
