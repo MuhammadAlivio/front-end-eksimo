@@ -38,7 +38,7 @@ export default function SignupPage() {
       <div className="flex w-1/2 items-center justify-center bg-[#69b9e7] rounded-r-3xl">
         <div className="relative mx-auto">
           <img
-            src="/rumah-eskimo.png"
+            src="/images/products/register.jpg"
             alt="rumah eskimo"
             className="object-contain h-[500px] w-[625px]"
           />

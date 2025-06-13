@@ -121,7 +121,7 @@ export default function LoginPage() {
       <div className="flex w-1/2 items-center justify-center bg-[#69b9e7] rounded-l-3xl">
         <div className="relative mx-auto">
           <img
-            src="/club-character.png"
+            src="/images/products/login.jpg"
             alt="Club character"
             className="object-contain h-[500px] w-[625px]"
           />
