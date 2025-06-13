@@ -71,9 +71,11 @@ export default function Component() {
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <h1 className="text-4xl md:text-5xl font-bold text-gray-900">My Cart</h1>
-          <Button variant="outline" className="bg-blue-200 border-blue-200 text-gray-700 hover:bg-blue-300">
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Continue shopping
+          <Button asChild variant="outline" className="bg-blue-200 border-blue-200 text-gray-700 hover:bg-blue-300">
+            <a href="/homepage">
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Continue shopping
+            </a>
           </Button>
         </div>
 

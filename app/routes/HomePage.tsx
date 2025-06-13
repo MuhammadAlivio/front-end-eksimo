@@ -62,10 +62,12 @@ export default function HomePage() {
         {error && <p className="text-red-600 mb-4">{error}</p>}
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {products.map((product: any) => (
+          {products.map((product) => (
             <div key={product.id} className="text-center">
               <div className="mb-6">
-                <img src={product.image || "/placeholder.jpg"} alt={product.name} className="w-full h-auto rounded-lg shadow-sm" />
+                <a href={`/detailBarang/${product.id}`}>
+                  <img src={product.image || "/placeholder.jpg"} alt={product.name} className="w-full h-auto rounded-lg shadow-sm cursor-pointer" />
+                </a>
               </div>
               <h2 className="text-xl font-normal text-gray-800">{product.name}</h2>
               <p className="text-gray-600 text-sm">Rp {product.price.toLocaleString()}</p>
