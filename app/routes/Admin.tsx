@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { ShoppingBag, ShoppingCart, User, Plus, Minus } from "lucide-react";
+import { ShoppingBag, ShoppingCart, User, LogOut, Plus, Minus } from "lucide-react";
 import { Button } from "../components/ui/button";
 import axios from "axios";
 
@@ -41,14 +41,11 @@ export default function Component() {
     const fetchProducts = async () => {
       try {
         const token = localStorage.getItem("token");
-        const response = await axios.get(
-          "http://localhost:8080/api/admin/products",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        const response = await axios.get("http://localhost:8080/api/admin/products", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
         setProducts(response.data.products);
       } catch (err: any) {
         console.error("Failed to fetch products:", err);
@@ -58,12 +55,9 @@ export default function Component() {
     const fetchOrders = async () => {
       try {
         const token = localStorage.getItem("token");
-        const response = await axios.get(
-          "http://localhost:8080/api/admin/orders",
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
+        const response = await axios.get("http://localhost:8080/api/admin/orders", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
         setOrders(response.data);
       } catch (err) {
         console.error("Failed to fetch orders:", err);
@@ -76,23 +70,16 @@ export default function Component() {
 
   // Pindahkan handleDeleteProduct ke sini!
   const handleDeleteProduct = async (productId: number) => {
-    if (!window.confirm("Are you sure you want to delete this product?"))
-      return;
+    if (!window.confirm("Are you sure you want to delete this product?")) return;
     const token = localStorage.getItem("token");
     try {
-      await axios.delete(
-        `http://localhost:8080/api/admin/products/${productId}`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
+      await axios.delete(`http://localhost:8080/api/admin/products/${productId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       setProducts((prev) => prev.filter((p) => p.id !== productId));
       alert("Product deleted successfully");
     } catch (err: any) {
-      alert(
-        "Failed to delete product: " +
-          (err.response?.data?.message || err.message)
-      );
+      alert("Failed to delete product: " + (err.response?.data?.message || err.message));
     }
   };
 
@@ -127,7 +114,9 @@ export default function Component() {
           <div className="flex items-center space-x-4">
             <ShoppingBag className="w-6 h-6 cursor-pointer hover:opacity-80" />
             <ShoppingCart className="w-6 h-6 cursor-pointer hover:opacity-80" />
-            <User className="w-6 h-6 cursor-pointer hover:opacity-80" />
+            <a href="/" title="Logout">
+              <LogOut className="text-white w-6 h-6 cursor-pointer" />
+            </a>
           </div>
         </div>
       </header>
@@ -147,10 +136,7 @@ export default function Component() {
           {/* Button add product */}
           <div className="flex items-center justify-between bg-blue-300 text-white p-4">
             <div className="font-medium text-lg">Product List</div>
-            <button
-              className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded"
-              onClick={() => (window.location.href = "/product")}
-            >
+            <button className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded" onClick={() => (window.location.href = "/product")}>
               + Add Product
             </button>
           </div>
@@ -162,56 +148,29 @@ export default function Component() {
                   {/* Product Info */}
                   <div className="flex items-center space-x-3">
                     <div className="w-16 h-16 relative rounded-lg overflow-hidden bg-gray-100">
-                      <img
-                        src={product.image || "/placeholder.svg"}
-                        alt={product.name}
-                        className="object-cover"
-                      />
+                      <img src={product.image || "/placeholder.svg"} alt={product.name} className="object-cover" />
                     </div>
-                    <span className="font-medium text-gray-900">
-                      {product.name}
-                    </span>
+                    <span className="font-medium text-gray-900">{product.name}</span>
                   </div>
                   {/* Price */}
-                  <div className="text-center font-medium text-gray-900">
-                    {formatPrice(product.price)}
-                  </div>
+                  <div className="text-center font-medium text-gray-900">{formatPrice(product.price)}</div>
                   {/* Stock Info */}
                   <div className="flex flex-col items-center justify-center">
-                    <span className="font-semibold text-lg">
-                      {product.stock}
-                    </span>
+                    <span className="font-semibold text-lg">{product.stock}</span>
                     {product.stock > 10 ? (
-                      <span className="mt-1 px-2 py-0.5 text-xs rounded bg-green-100 text-green-700 font-semibold">
-                        In Stock
-                      </span>
+                      <span className="mt-1 px-2 py-0.5 text-xs rounded bg-green-100 text-green-700 font-semibold">In Stock</span>
                     ) : product.stock > 0 ? (
-                      <span className="mt-1 px-2 py-0.5 text-xs rounded bg-yellow-100 text-yellow-700 font-semibold">
-                        Low Stock
-                      </span>
+                      <span className="mt-1 px-2 py-0.5 text-xs rounded bg-yellow-100 text-yellow-700 font-semibold">Low Stock</span>
                     ) : (
-                      <span className="mt-1 px-2 py-0.5 text-xs rounded bg-red-100 text-red-700 font-semibold">
-                        Out of Stock
-                      </span>
+                      <span className="mt-1 px-2 py-0.5 text-xs rounded bg-red-100 text-red-700 font-semibold">Out of Stock</span>
                     )}
                   </div>
                   {/* Actions */}
                   <div className="flex items-center justify-center space-x-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() =>
-                        (window.location.href = `/product/${product.id}`)
-                      }
-                    >
+                    <Button variant="outline" size="sm" onClick={() => (window.location.href = `/product/${product.id}`)}>
                       Edit
                     </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="text-red-600 hover:text-red-700"
-                      onClick={() => handleDeleteProduct(product.id)}
-                    >
+                    <Button variant="outline" size="sm" className="text-red-600 hover:text-red-700" onClick={() => handleDeleteProduct(product.id)}>
                       Delete
                     </Button>
                   </div>
@@ -242,11 +201,7 @@ export default function Component() {
                   <div>{order.username}</div>
                   <div>{order.status}</div>
                   <div>{formatPrice(order.totalPrice)}</div>
-                  <div>
-                    {order.orderDate
-                      ? new Date(order.orderDate).toLocaleString()
-                      : ""}
-                  </div>
+                  <div>{order.orderDate ? new Date(order.orderDate).toLocaleString() : ""}</div>
                 </div>
               </div>
             ))}

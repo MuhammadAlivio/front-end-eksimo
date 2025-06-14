@@ -88,6 +88,7 @@ export default function Component() {
             {/* Title and Rating */}
             <div className="space-y-3">
               <h1 className="text-3xl md:text-4xl font-bold text-gray-900">{product.name}</h1>
+
               <div className="flex items-center gap-2">
                 <div className="flex items-center">
                   {[...Array(5)].map((_, i) => (
@@ -96,6 +97,7 @@ export default function Component() {
                 </div>
                 <span className="text-gray-600 text-sm">(120 reviews)</span>
               </div>
+              <div className="text-sm text-gray-600">{product.description}</div>
             </div>
 
             {/* Price */}

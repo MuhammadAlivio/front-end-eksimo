@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { ShoppingCart, User, ShoppingBag } from "lucide-react";
+import { ShoppingCart, User, ShoppingBag, LogOut } from "lucide-react";
 
 export default function HomePage() {
   const [products, setProducts] = useState<any[]>([]);
@@ -51,8 +51,10 @@ export default function HomePage() {
             <a href="/cart">
               <ShoppingCart className="text-white w-6 h-6 cursor-pointer" />
             </a>
-            <User className="text-white w-6 h-6" />
             <ShoppingBag className="text-white w-6 h-6" />
+            <a href="/" title="Logout">
+              <LogOut className="text-white w-6 h-6 cursor-pointer" />
+            </a>
           </div>
         </div>
       </header>
