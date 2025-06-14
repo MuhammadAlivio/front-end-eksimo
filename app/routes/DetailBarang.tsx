@@ -3,7 +3,13 @@
 import { useEffect, useState } from "react";
 import { Star, Minus, Plus } from "lucide-react";
 import { Button } from "../components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../components/ui/select";
 import { useParams } from "react-router";
 import axios from "axios";
 
@@ -30,9 +36,12 @@ export default function Component() {
         return;
       }
       try {
-        const response = await axios.get(`http://localhost:8080/api/customer/products/${id}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const response = await axios.get(
+          `http://localhost:8080/api/customer/products/${id}`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
         setProduct(response.data);
       } catch (err: any) {
         setError(err.response?.data || "Failed to fetch product");
@@ -64,12 +73,20 @@ export default function Component() {
     }
   };
 
+  const handleBuyNow = () => {
+      window.location.href = `/payment/${product.id}/${quantity}`;
+  };
+
   if (error) return <div className="text-red-600">{error}</div>;
   if (!product) return <div>Loading...</div>;
 
   return (
     <div className="min-h-screen bg-gray-50 p-4 md:p-8">
-      <button className="absolute top-6 right-6 z-10 text-3xl text-gray-400 hover:text-gray-700 font-bold focus:outline-none" aria-label="Close" style={{ background: "none", border: "none" }}>
+      <button
+        className="absolute top-6 right-6 z-10 text-3xl text-gray-400 hover:text-gray-700 font-bold focus:outline-none"
+        aria-label="Close"
+        style={{ background: "none", border: "none" }}
+      >
         <a href="/homepage" className="no-underline text-inherit">
           &times;
         </a>
@@ -79,7 +96,11 @@ export default function Component() {
           {/* Product Image */}
           <div className="p-6 md:p-8">
             <div className="aspect-square relative rounded-xl overflow-hidden">
-              <img src={product.image || "/placeholder.jpg"} alt={product.name} className="w-full h-auto rounded-lg shadow-sm" />
+              <img
+                src={product.image || "/placeholder.jpg"}
+                alt={product.name}
+                className="w-full h-auto rounded-lg shadow-sm"
+              />
             </div>
           </div>
 
@@ -87,12 +108,17 @@ export default function Component() {
           <div className="p-6 md:p-8 space-y-6">
             {/* Title and Rating */}
             <div className="space-y-3">
-              <h1 className="text-3xl md:text-4xl font-bold text-gray-900">{product.name}</h1>
+              <h1 className="text-3xl md:text-4xl font-bold text-gray-900">
+                {product.name}
+              </h1>
 
               <div className="flex items-center gap-2">
                 <div className="flex items-center">
                   {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="w-5 h-5 fill-yellow-400 text-yellow-400" />
+                    <Star
+                      key={i}
+                      className="w-5 h-5 fill-yellow-400 text-yellow-400"
+                    />
                   ))}
                 </div>
                 <span className="text-gray-600 text-sm">(120 reviews)</span>
@@ -101,7 +127,9 @@ export default function Component() {
             </div>
 
             {/* Price */}
-            <div className="text-3xl font-bold text-blue-400">Rp {product.price.toLocaleString()}</div>
+            <div className="text-3xl font-bold text-blue-400">
+              Rp {product.price.toLocaleString()}
+            </div>
 
             {/* Size Selection */}
             <div className="space-y-3">
@@ -113,7 +141,11 @@ export default function Component() {
                     onClick={() => setSelectedSize(size)}
                     disabled={!availableSizes.includes(size)}
                     className={`px-4 py-2 border rounded-md text-sm font-medium transition-colors ${
-                      selectedSize === size ? "border-gray-900 bg-gray-900 text-white" : availableSizes.includes(size) ? "border-gray-300 text-gray-700 hover:border-gray-400" : "border-gray-200 text-gray-400 cursor-not-allowed"
+                      selectedSize === size
+                        ? "border-gray-900 bg-gray-900 text-white"
+                        : availableSizes.includes(size)
+                        ? "border-gray-300 text-gray-700 hover:border-gray-400"
+                        : "border-gray-200 text-gray-400 cursor-not-allowed"
                     }`}
                   >
                     {size}
@@ -133,11 +165,17 @@ export default function Component() {
               <h3 className="text-lg font-semibold text-gray-900">Quantity</h3>
               <div className="flex items-center gap-4">
                 <div className="flex items-center border rounded-md">
-                  <button onClick={decrementQuantity} className="p-2 hover:bg-gray-100 transition-colors">
+                  <button
+                    onClick={decrementQuantity}
+                    className="p-2 hover:bg-gray-100 transition-colors"
+                  >
                     <Minus className="w-4 h-4" />
                   </button>
                   <span className="px-4 py-2 font-medium">{quantity}</span>
-                  <button onClick={incrementQuantity} className="p-2 hover:bg-gray-100 transition-colors">
+                  <button
+                    onClick={incrementQuantity}
+                    className="p-2 hover:bg-gray-100 transition-colors"
+                  >
                     <Plus className="w-4 h-4" />
                   </button>
                 </div>
@@ -146,10 +184,15 @@ export default function Component() {
 
             {/* Action Buttons */}
             <div className="flex gap-3 pt-4">
-              <Button variant="outline" size="lg" className="flex-1 bg-blue-400 text-white border-blue-400 hover:bg-blue-500 hover:border-blue-500" onClick={handleAddToCart}>
+              <Button
+                variant="outline"
+                size="lg"
+                className="flex-1 bg-blue-400 text-white border-blue-400 hover:bg-blue-500 hover:border-blue-500"
+                onClick={handleAddToCart}
+              >
                 Add to cart
               </Button>
-              <Button size="lg" className="flex-1 bg-red-500 hover:bg-red-600">
+              <Button size="lg" className="flex-1 bg-red-500 hover:bg-red-600" onClick={handleBuyNow}>
                 Buy Now
               </Button>
             </div>

@@ -1,7 +1,5 @@
-"use client"
-
 import { useEffect, useState } from "react";
-import axios from "axios";
+import { useParams } from "react-router";
 
 interface CartItem {
   cartItemId: number;
@@ -13,26 +11,38 @@ interface CartItem {
   subtotal: number;
 }
 
+interface ProductDetail {
+  id: number;
+  name: string;
+  image: string;
+  price: number;
+}
+
 interface UserProfile {
   address: string;
   name: string;
 }
 
-export default function PaymentPage({ itemId }: { itemId?: number }) {
+export default function PaymentPage() {
+  const { id, quantity } = useParams();
+  const qty = quantity ? Number(quantity) : 1;
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const [singleProduct, setSingleProduct] = useState<ProductDetail | null>(null);
   const [user, setUser] = useState<UserProfile | null>(null);
   const [paymentMethod, setPaymentMethod] = useState("");
   const [loading, setLoading] = useState(true);
+  console.log("id param:", id);
 
-  // Fetch user profile (untuk shipping address)
+  // Fetch user profile (shipping address)
   useEffect(() => {
     const fetchUser = async () => {
       try {
         const token = localStorage.getItem("token");
-        const res = await axios.get("http://localhost:8080/api/customer/profile", {
+        const res = await fetch("http://localhost:8080/api/customer/profile", {
           headers: { Authorization: `Bearer ${token}` },
         });
-        setUser(res.data);
+        const data = await res.json();
+        setUser(data);
       } catch {
         setUser(null);
       }
@@ -40,33 +50,36 @@ export default function PaymentPage({ itemId }: { itemId?: number }) {
     fetchUser();
   }, []);
 
-  // Fetch cart items (atau single item jika checkout per item)
+  // Fetch single product or cart
   useEffect(() => {
-    const fetchCart = async () => {
+    const fetchData = async () => {
       setLoading(true);
       try {
         const token = localStorage.getItem("token");
-        if (itemId) {
-          // Checkout per item
-          const res = await axios.get(`http://localhost:8080/api/customer/cart/item/${itemId}`, {
+        if (id) {
+          // Mode single product
+          const res = await fetch(`http://localhost:8080/api/customer/products/${id}`, {
             headers: { Authorization: `Bearer ${token}` },
           });
-          setCartItems([res.data]);
+          const data = await res.json();
+          setSingleProduct(data.product || data); // sesuaikan response backend
         } else {
-          // Checkout semua cart
-          const res = await axios.get("http://localhost:8080/api/customer/cart", {
+          // Mode cart
+          const res = await fetch("http://localhost:8080/api/customer/cart", {
             headers: { Authorization: `Bearer ${token}` },
           });
-          setCartItems(res.data.items);
+          const data = await res.json();
+          setCartItems(data.items);
         }
       } catch {
         setCartItems([]);
+        setSingleProduct(null);
       } finally {
         setLoading(false);
       }
     };
-    fetchCart();
-  }, [itemId]);
+    fetchData();
+  }, [id, quantity]);
 
   const handleCheckout = async () => {
     if (!paymentMethod) {
@@ -75,19 +88,47 @@ export default function PaymentPage({ itemId }: { itemId?: number }) {
     }
     try {
       const token = localStorage.getItem("token");
-      await axios.post(
-        "http://localhost:8080/api/customer/checkout",
+    if (id && singleProduct) {
+      const res = await fetch(
+        `http://localhost:8080/api/customer/checkout/product/${id}`,
         {
-          shippingAddress: user?.address || "",
-          paymentMethod,
-        },
-        {
-          headers: { Authorization: `Bearer ${token}` },
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            shippingAddress: user?.address || "",
+            paymentMethod,
+            quantity: qty,
+          }),
         }
       );
+      if (!res.ok) {
+        const err = await res.json();
+        alert(err.message || "Checkout failed");
+        return;
+      }
+    } else {
+        // Checkout cart
+        await fetch(
+          "http://localhost:8080/api/customer/checkout",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+              shippingAddress: user?.address || "",
+              paymentMethod,
+            }),
+          }
+        );
+      }
       window.location.href = "/PaymentSuccess";
     } catch (err: any) {
-      alert(err.response?.data?.message || "Checkout failed");
+      alert("Checkout failed");
     }
   };
 
@@ -101,6 +142,31 @@ export default function PaymentPage({ itemId }: { itemId?: number }) {
           <h2 className="text-xl font-semibold mb-2">Product to Checkout</h2>
           {loading ? (
             <div className="text-gray-500">Loading...</div>
+          ) : id && singleProduct ? (
+            // Mode single product
+            <div className="flex items-center py-4 gap-4">
+              <img
+                src={singleProduct.image || "/placeholder.jpg"}
+                alt={singleProduct.name}
+                className="w-16 h-16 object-cover rounded border"
+              />
+              <div className="flex-1">
+                <div className="font-medium">{singleProduct.name}</div>
+                <div className="text-sm text-gray-500">
+                  Qty: {qty} &middot; Price:{" "}
+                  {singleProduct.price.toLocaleString("id-ID", {
+                    style: "currency",
+                    currency: "IDR",
+                  })}
+                </div>
+              </div>
+              <div className="font-semibold text-gray-900">
+                {(singleProduct.price * (qty ?? 1)).toLocaleString("id-ID", {
+                  style: "currency",
+                  currency: "IDR",
+                })}
+              </div>
+            </div>
           ) : cartItems.length === 0 ? (
             <div className="text-gray-400">No items to checkout.</div>
           ) : (
@@ -153,7 +219,6 @@ export default function PaymentPage({ itemId }: { itemId?: number }) {
             <option value="">Select payment method</option>
             <option value="COD">Cash on Delivery</option>
             <option value="TRANSFER">Bank Transfer</option>
-            {/* Tambahkan opsi lain jika ada */}
           </select>
         </div>
 
@@ -161,7 +226,7 @@ export default function PaymentPage({ itemId }: { itemId?: number }) {
         <button
           className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded text-lg"
           onClick={handleCheckout}
-          disabled={loading || cartItems.length === 0}
+          disabled={loading || (!id && cartItems.length === 0)}
         >
           Confirm & Pay
         </button>
