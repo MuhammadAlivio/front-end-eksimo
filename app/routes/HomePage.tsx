@@ -2,37 +2,52 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { ShoppingCart, User, ShoppingBag, LogOut } from "lucide-react";
 
+const categories = [
+  { id: 1, name: "Baju" },
+  { id: 2, name: "Outer" },
+  { id: 3, name: "Accessories" },
+];
+
 export default function HomePage() {
   const [products, setProducts] = useState<any[]>([]);
   const [error, setError] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
+
+  const fetchProducts = async (categoryId?: number) => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      setError("Unauthorized: No access token");
+      return;
+    }
+    try {
+      let url = "http://localhost:8080/api/customer/products";
+      if (categoryId) {
+        url = `http://localhost:8080/api/customer/products/category/${categoryId}`;
+      }
+      const response = await axios.get(url, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setProducts(response.data.products || response.data); // sesuaikan response backend
+      setError("");
+    } catch (err: any) {
+      setError(err.response?.data || "Failed to fetch products");
+      setProducts([]);
+    }
+  };
 
   useEffect(() => {
-    const fetchProducts = async () => {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        setError("Unauthorized: No access token");
-        return;
-      }
-
-      try {
-        const response = await axios.get("http://localhost:8080/api/customer/products", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        setProducts(response.data.products);
-      } catch (err: any) {
-        setError(err.response?.data || "Failed to fetch products");
-      }
-    };
-
     fetchProducts();
   }, []);
 
+  const handleCategoryFilter = (categoryId: number | null) => {
+    setSelectedCategory(categoryId);
+    fetchProducts(categoryId || undefined);
+  };
+
   const handleLogout = async () => {
     try {
-      // Panggil endpoint logout (opsional, untuk formalitas)
       await axios.post(
         "http://localhost:8080/api/auth/logout",
         {},
@@ -42,12 +57,8 @@ export default function HomePage() {
           },
         }
       );
-    } catch (err) {
-      // Bisa diabaikan, karena logout utama di client
-    }
-    // Hapus token dari localStorage
+    } catch (err) {}
     localStorage.removeItem("token");
-    // Redirect ke halaman login
     window.location.href = "/";
   };
 
@@ -65,7 +76,7 @@ export default function HomePage() {
               Latest release
             </a>
             <a href="#" className="text-white hover:text-gray-100 transition-colors">
-              Categories
+              Best Seller
             </a>
           </nav>
           <div className="flex items-center space-x-4">
@@ -75,13 +86,31 @@ export default function HomePage() {
             <a href="/history">
               <ShoppingBag className="text-white w-6 h-6" />
             </a>
-            
             <button title="Logout" onClick={handleLogout} className="bg-transparent border-none p-0 m-0" style={{ lineHeight: 0 }}>
               <LogOut className="text-white w-6 h-6 cursor-pointer" />
             </button>
           </div>
         </div>
       </header>
+
+      {/* Filter by Category */}
+      <div className="max-w-7xl mx-auto px-6 mt-8 flex gap-4">
+        <button
+          className={`px-4 py-2 rounded ${selectedCategory === null ? "bg-sky-400 text-white" : "bg-gray-200 text-gray-700"}`}
+          onClick={() => handleCategoryFilter(null)}
+        >
+          All
+        </button>
+        {categories.map((cat) => (
+          <button
+            key={cat.id}
+            className={`px-4 py-2 rounded ${selectedCategory === cat.id ? "bg-sky-400 text-white" : "bg-gray-200 text-gray-700"}`}
+            onClick={() => handleCategoryFilter(cat.id)}
+          >
+            {cat.name}
+          </button>
+        ))}
+      </div>
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-6 py-12">
