@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { ArrowLeft, Check } from "lucide-react";
+import { ArrowLeft, Check, Trash2 } from "lucide-react";
 import { Button } from "../components/ui/button";
 
 interface CartItem {
@@ -29,29 +29,46 @@ export default function Component() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
+  const fetchCart = async () => {
+    setLoading(true);
+    setError("");
+    const token = localStorage.getItem("token");
+    if (!token) {
+      setError("Unauthorized: No access token");
+      setLoading(false);
+      return;
+    }
+    try {
+      const response = await axios.get("http://localhost:8080/api/customer/cart", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setCart(response.data);
+    } catch (err: any) {
+      setError(err.response?.data?.message || "Failed to fetch cart");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchCart = async () => {
-      setLoading(true);
-      setError("");
-      const token = localStorage.getItem("token");
-      if (!token) {
-        setError("Unauthorized: No access token");
-        setLoading(false);
-        return;
-      }
-      try {
-        const response = await axios.get("http://localhost:8080/api/customer/cart", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setCart(response.data);
-      } catch (err: any) {
-        setError(err.response?.data?.message || "Failed to fetch cart");
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchCart();
   }, []);
+
+  const handleRemoveItem = async (cartItemId: number) => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      setError("Unauthorized: No access token");
+      return;
+    }
+    try {
+      await axios.delete(`http://localhost:8080/api/customer/cart/items/${cartItemId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      fetchCart();
+    } catch (err: any) {
+      setError(err.response?.data?.message || "Failed to remove item");
+    }
+  };
 
   const subtotal = cart?.grandTotal || 0;
   const shippingCost = shippingMode === "store-pickup" ? 0 : 25000;
@@ -99,6 +116,9 @@ export default function Component() {
               cart.items.map((item) => (
                 <div key={item.cartItemId} className="grid grid-cols-4 gap-4 py-4 border-b border-gray-100 last:border-b-0 items-center">
                   <div className="flex items-center space-x-4">
+                    <button onClick={() => handleRemoveItem(item.cartItemId)} className="text-red-500 hover:text-red-700" title="Remove from cart">
+                      <Trash2 className="w-5 h-5" />
+                    </button>
                     <img src={item.productImageUrl || "/placeholder.jpg"} alt={item.productName} className="w-16 h-16 object-cover rounded" />
                     <span className="font-medium text-gray-900">{item.productName}</span>
                   </div>
@@ -172,7 +192,7 @@ export default function Component() {
               </div>
 
               {/* Button checkout */}
-              <Button className="w-full bg-red-500 hover:bg-red-600 text-white font-medium py-3 mt-6" size="lg" onClick={() => window.location.href = "/payment"}>
+              <Button className="w-full bg-red-500 hover:bg-red-600 text-white font-medium py-3 mt-6" size="lg" onClick={() => (window.location.href = "/payment")}>
                 Checkout
               </Button>
             </div>
