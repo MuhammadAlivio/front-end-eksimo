@@ -30,6 +30,27 @@ export default function HomePage() {
     fetchProducts();
   }, []);
 
+  const handleLogout = async () => {
+    try {
+      // Panggil endpoint logout (opsional, untuk formalitas)
+      await axios.post(
+        "http://localhost:8080/api/auth/logout",
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+    } catch (err) {
+      // Bisa diabaikan, karena logout utama di client
+    }
+    // Hapus token dari localStorage
+    localStorage.removeItem("token");
+    // Redirect ke halaman login
+    window.location.href = "/";
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
@@ -52,9 +73,9 @@ export default function HomePage() {
               <ShoppingCart className="text-white w-6 h-6 cursor-pointer" />
             </a>
             <ShoppingBag className="text-white w-6 h-6" />
-            <a href="/" title="Logout">
+            <button title="Logout" onClick={handleLogout} className="bg-transparent border-none p-0 m-0" style={{ lineHeight: 0 }}>
               <LogOut className="text-white w-6 h-6 cursor-pointer" />
-            </a>
+            </button>
           </div>
         </div>
       </header>

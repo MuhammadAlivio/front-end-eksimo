@@ -68,6 +68,27 @@ export default function Component() {
     fetchOrders();
   }, []);
 
+  const handleLogout = async () => {
+    try {
+      // Panggil endpoint logout (opsional, untuk formalitas)
+      await axios.post(
+        "http://localhost:8080/api/auth/logout",
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+    } catch (err) {
+      // Bisa diabaikan, karena logout utama di client
+    }
+    // Hapus token dari localStorage
+    localStorage.removeItem("token");
+    // Redirect ke halaman login
+    window.location.href = "/";
+  };
+
   // Pindahkan handleDeleteProduct ke sini!
   const handleDeleteProduct = async (productId: number) => {
     if (!window.confirm("Are you sure you want to delete this product?")) return;
@@ -114,9 +135,9 @@ export default function Component() {
           <div className="flex items-center space-x-4">
             <ShoppingBag className="w-6 h-6 cursor-pointer hover:opacity-80" />
             <ShoppingCart className="w-6 h-6 cursor-pointer hover:opacity-80" />
-            <a href="/" title="Logout">
+            <button title="Logout" onClick={handleLogout} className="bg-transparent border-none p-0 m-0" style={{ lineHeight: 0 }}>
               <LogOut className="text-white w-6 h-6 cursor-pointer" />
-            </a>
+            </button>
           </div>
         </div>
       </header>
