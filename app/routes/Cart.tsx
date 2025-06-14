@@ -171,6 +171,7 @@ export default function Component() {
                 <span className="font-bold text-gray-900 text-lg">{formatPrice(total)}</span>
               </div>
 
+              {/* Button checkout */}
               <Button className="w-full bg-red-500 hover:bg-red-600 text-white font-medium py-3 mt-6" size="lg">
                 Checkout
               </Button>

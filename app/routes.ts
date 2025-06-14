@@ -6,6 +6,7 @@ export default [
   route("homepage", "routes/HomePage.tsx"),
   route("cart", "routes/Cart.tsx"),
   route("admin", "routes/Admin.tsx"),
+  route("history", "routes/History.tsx"),
   route("detailBarang/:id", "routes/DetailBarang.tsx"),
   route("product/:productId?", "routes/AddOrEditProduct.tsx"),
 ] satisfies RouteConfig;

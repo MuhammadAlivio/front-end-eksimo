@@ -72,7 +72,10 @@ export default function HomePage() {
             <a href="/cart">
               <ShoppingCart className="text-white w-6 h-6 cursor-pointer" />
             </a>
-            <ShoppingBag className="text-white w-6 h-6" />
+            <a href="/history">
+              <ShoppingBag className="text-white w-6 h-6" />
+            </a>
+            
             <button title="Logout" onClick={handleLogout} className="bg-transparent border-none p-0 m-0" style={{ lineHeight: 0 }}>
               <LogOut className="text-white w-6 h-6 cursor-pointer" />
             </button>
