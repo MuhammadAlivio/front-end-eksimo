@@ -172,7 +172,7 @@ export default function Component() {
               </div>
 
               {/* Button checkout */}
-              <Button className="w-full bg-red-500 hover:bg-red-600 text-white font-medium py-3 mt-6" size="lg">
+              <Button className="w-full bg-red-500 hover:bg-red-600 text-white font-medium py-3 mt-6" size="lg" onClick={() => window.location.href = "/payment"}>
                 Checkout
               </Button>
             </div>
