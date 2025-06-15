@@ -11,26 +11,16 @@ export default function LoginPage() {
   // ...existing code...
   const handleLogin = async () => {
     try {
-      const response = await axios.post(
-        "http://localhost:8080/api/auth/login",
-        {
-          username,
-          password,
-        }
-      );
-      const {
-        accessToken,
-        tokenType,
-        username: usernameResponse,
-        authorities,
-      } = response.data;
+      const response = await axios.post("http://localhost:8080/api/auth/login", {
+        username,
+        password,
+      });
+      const { accessToken, tokenType, username: usernameResponse, authorities } = response.data;
 
       // Save token in localStorage or context
       localStorage.setItem("token", accessToken);
       localStorage.setItem("username", usernameResponse);
-      const roles = authorities.map(
-        (auth: { authority: string }) => auth.authority
-      );
+      const roles = authorities.map((auth: { authority: string }) => auth.authority);
       if (roles.includes("ROLE_ADMIN")) {
         window.location.href = "/admin";
       } else if (roles.includes("ROLE_CUSTOMER")) {
@@ -51,35 +41,21 @@ export default function LoginPage() {
 
   return (
     <div className="flex h-screen w-full bg-[#fdf6e3]">
-      <div className="flex w-1/2 items-center justify-center bg-[#fdf6e3]">
+      <div className="flex w-1/2 items-center justify-center bg-[#f5f5f5]">
         <div className="w-[400px] max-w-[80%]">
-          <h1 className="mb-10 text-3xl font-bold text-[#111]">
-            Let&apos;s Get Started
-          </h1>
+          <h1 className="mb-10 text-3xl font-bold text-[#111]">Let&apos;s Get Started</h1>
 
           {error && <div className="mb-4 text-sm text-red-600">{error}</div>}
 
           <div className="mb-6">
-            <label
-              htmlFor="username"
-              className="mb-1 block text-xs uppercase tracking-wide text-[#666]"
-            >
+            <label htmlFor="username" className="mb-1 block text-xs uppercase tracking-wide text-[#666]">
               Email
             </label>
-            <input
-              id="username"
-              type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              className="w-full rounded-md border border-[#ccc] bg-transparent px-4 py-3 focus:border-[#0099ff] focus:outline-none text-black"
-            />
+            <input id="username" type="text" value={username} onChange={(e) => setUsername(e.target.value)} className="w-full rounded-md border border-[#ccc] bg-transparent px-4 py-3 focus:border-[#0099ff] focus:outline-none text-black" />
           </div>
 
           <div className="mb-8">
-            <label
-              htmlFor="password"
-              className="mb-1 block text-xs uppercase tracking-wide text-[#666]"
-            >
+            <label htmlFor="password" className="mb-1 block text-xs uppercase tracking-wide text-[#666]">
               Password
             </label>
             <input
@@ -91,10 +67,7 @@ export default function LoginPage() {
             />
           </div>
 
-          <button
-            onClick={handleLogin}
-            className="mb-4 w-full rounded-lg bg-[#0099ff] py-3 text-center font-medium text-white transition-colors hover:bg-[#0088ee]"
-          >
+          <button onClick={handleLogin} className="mb-4 w-full rounded-lg bg-[#0099ff] py-3 text-center font-medium text-white transition-colors hover:bg-[#0088ee]">
             LOGIN
           </button>
 
@@ -107,10 +80,7 @@ export default function LoginPage() {
           <div>
             <p className="text-gray-600">
               Already have an account?{" "}
-              <a
-                href="signup"
-                className="text-blue-500 hover:text-blue-600 font-medium"
-              >
+              <a href="signup" className="text-blue-500 hover:text-blue-600 font-medium">
                 Register
               </a>
             </p>
@@ -120,11 +90,7 @@ export default function LoginPage() {
 
       <div className="flex w-1/2 items-center justify-center bg-[#69b9e7] rounded-l-3xl">
         <div className="relative mx-auto">
-          <img
-            src="/images/products/login.jpg"
-            alt="Club character"
-            className="object-contain h-[500px] w-[625px]"
-          />
+          <img src="/images/products/login.jpg" alt="Club character" className="rounded-lg shadow-lg h-[550px] w-[450px]" />
         </div>
       </div>
     </div>

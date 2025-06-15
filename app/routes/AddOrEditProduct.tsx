@@ -51,11 +51,7 @@ export default function AddOrEditProduct() {
 
   const isEdit = !!productId;
 
-  const handleChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-    >
-  ) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value, files } = e.target as any;
     if (name === "image") {
       setForm((f) => ({
@@ -100,15 +96,11 @@ export default function AddOrEditProduct() {
     try {
       if (isEdit && productId) {
         // UPDATE
-        await axios.put(
-          `http://localhost:8080/api/admin/products/${productId}`,
-          data,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        await axios.put(`http://localhost:8080/api/admin/products/${productId}`, data, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
       } else {
         // ADD
         await axios.post("http://localhost:8080/api/admin/products", data, {
@@ -119,29 +111,24 @@ export default function AddOrEditProduct() {
       }
       window.location.href = "/admin";
     } catch (err: any) {
-      console.error(
-        isEdit ? "Failed to update product:" : "Failed to add product:",
-        err.response?.data || err.message
-      );
-      alert(
-        err.response?.data?.message ||
-          (isEdit ? "Failed to update product" : "Failed to add product")
-      );
+      console.error(isEdit ? "Failed to update product:" : "Failed to add product:", err.response?.data || err.message);
+      alert(err.response?.data?.message || (isEdit ? "Failed to update product" : "Failed to add product"));
     }
   };
 
   return (
     <div className="max-w-xl mx-auto p-6 bg-white rounded shadow mt-8">
-      <h2 className="text-xl font-bold mb-4">
-        {isEdit ? "Edit" : "Add"} Product
-      </h2>
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <h2 className="text-xl font-bold mb-4">{isEdit ? "Edit" : "Add"} Product</h2>
+      <form onSubmit={handleSubmit} className="space-y-6">
         <input
           name="name"
           value={form.name}
           onChange={handleChange}
           placeholder="Name"
-          className="w-full border p-2"
+          className="w-full border-2 border-gray-300 focus:border-blue-500 
+                          focus:ring-2 focus:ring-blue-200 focus:outline-none
+                          rounded-xl px-4 py-3 bg-white transition-all duration-200 
+                          placeholder:text-gray-400"
           required
         />
         <textarea
@@ -149,7 +136,10 @@ export default function AddOrEditProduct() {
           value={form.description}
           onChange={handleChange}
           placeholder="Description"
-          className="w-full border p-2"
+          className="w-full border-2 border-gray-300 focus:border-blue-500
+                    focus:ring-2 focus:ring-blue-200 focus:outline-none
+                    rounded-xl px-4 py-3 bg-white transition-all duration-200 
+                    placeholder:text-gray-400"
           required
         />
         <input
@@ -158,7 +148,10 @@ export default function AddOrEditProduct() {
           value={form.price}
           onChange={handleChange}
           placeholder="Price"
-          className="w-full border p-2"
+          className="w-full border-2 border-gray-300 focus:border-blue-500
+                    focus:ring-2 focus:ring-blue-200 focus:outline-none
+                    rounded-xl px-4 py-3 bg-white transition-all duration-200 
+                    placeholder:text-gray-400"
           required
         />
         <input
@@ -167,14 +160,20 @@ export default function AddOrEditProduct() {
           value={form.stock}
           onChange={handleChange}
           placeholder="Stock"
-          className="w-full border p-2"
+          className="w-full border-2 border-gray-300 focus:border-blue-500
+                    focus:ring-2 focus:ring-blue-200 focus:outline-none
+                    rounded-xl px-4 py-3 bg-white transition-all duration-200 
+                    placeholder:text-gray-400"
           required
         />
         <select
           name="categoryId"
           value={form.categoryId}
           onChange={handleChange}
-          className="w-full border p-2"
+          className="w-full border-2 border-gray-300 focus:border-blue-500
+                    focus:ring-2 focus:ring-blue-200 focus:outline-none
+                    rounded-xl px-4 py-3 bg-white transition-all duration-200 
+                    placeholder:text-gray-400"
           required
         >
           <option value="">Select Category</option>
@@ -185,26 +184,24 @@ export default function AddOrEditProduct() {
         {/* Field image untuk add/edit */}
         <div>
           <label className="block mb-1 font-medium">Product Image</label>
-          {form.imageUrl && (
-            <img
-              src={form.imageUrl}
-              alt="Product"
-              className="mb-2 w-32 h-32 object-cover rounded"
-            />
-          )}
+          {form.imageUrl && <img src={form.imageUrl} alt="Product" className="mb-2 w-32 h-32 object-cover rounded" />}
           <input
             name="image"
             type="file"
             accept="image/*"
             onChange={handleChange}
-            className="w-full"
+            className="w-full text-gray-700 file:mr-4 file:py-2 file:px-4 
+                       file:rounded-lg file:border-0 file:text-sm file:font-medium
+                       file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100
+                       file:cursor-pointer cursor-pointer"
             // required hanya saat add
             required={!isEdit}
           />
         </div>
         <button
           type="submit"
-          className="bg-blue-500 text-white px-4 py-2 rounded"
+          className="bg-blue-500 hover:bg-blue-600 text-white font-semibold 
+                   px-6 py-3 rounded-lg transition-colors duration-200"
         >
           {isEdit ? "Update" : "Add"} Product
         </button>

@@ -29,13 +29,7 @@ interface OrderAdmin {
   orderDate: string;
 }
 
-const ORDER_STATUSES = [
-  "PENDING",
-  "PROCESSING",
-  "DELIVERED",
-  "COMPLETED",
-  "CANCELED",
-];
+const ORDER_STATUSES = ["PENDING", "PROCESSING", "DELIVERED", "COMPLETED", "CANCELED"];
 
 function formatPrice(price: number) {
   return price.toLocaleString("id-ID", { style: "currency", currency: "IDR" });
@@ -114,11 +108,7 @@ export default function Component() {
 
   // Fungsi untuk update status order
   async function updateOrderStatus(orderId: number, newStatus: string, token: string) {
-    await axios.put(
-      `http://localhost:8080/api/admin/orders/${orderId}/status?status=${newStatus}`,
-      {},
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
+    await axios.put(`http://localhost:8080/api/admin/orders/${orderId}/status?status=${newStatus}`, {}, { headers: { Authorization: `Bearer ${token}` } });
   }
 
   return (
@@ -158,8 +148,19 @@ export default function Component() {
           </div>
         </div>
       </header>
+      {/* Product List and Add Product */}
+      <div className="flex items-center justify-between text-blue pt-6 px-4">
+        <div className="font-bold text-3xl text-blue-400 dark:text-blue">Product List</div>
+        <button
+          onClick={() => (window.location.href = "/product")}
+          className="inline-flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white font-semibold px-6 py-2 rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200"
+        >
+          <span className="text-lg">+</span>
+          Add Product
+        </button>
+      </div>
 
-      <div className="max-w-7xl mx-auto p-6 space-y-8">
+      <div className="max-w-7xl mx-auto p-3 space-y-8">
         {/* Products Section */}
         <div className="bg-white rounded-lg shadow-sm overflow-hidden">
           {/* Products Header */}
@@ -170,13 +171,6 @@ export default function Component() {
               <div className="font-medium text-center">Stock</div>
               <div className="font-medium text-center">Actions</div>
             </div>
-          </div>
-          {/* Button add product */}
-          <div className="flex items-center justify-between bg-blue-300 text-white p-4">
-            <div className="font-medium text-lg">Product List</div>
-            <button className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded" onClick={() => (window.location.href = "/product")}>
-              + Add Product
-            </button>
           </div>
           {/* Products List */}
           <div className="divide-y divide-gray-200">
@@ -239,18 +233,14 @@ export default function Component() {
                   <div>{order.username}</div>
                   <div>
                     <select
-                      className="border rounded px-2 py-1"
+                      className="border-2 border-gray-300 hover:border-blue-500 rounded-lg px-5 py-3 bg-white transition-colors duration-200 cursor-pointer"
                       value={order.status}
                       onChange={async (e) => {
                         const newStatus = e.target.value;
                         const token = localStorage.getItem("token");
                         try {
                           await updateOrderStatus(order.orderId, newStatus, token!);
-                          setOrders((prev) =>
-                            prev.map((o) =>
-                              o.orderId === order.orderId ? { ...o, status: newStatus } : o
-                            )
-                          );
+                          setOrders((prev) => prev.map((o) => (o.orderId === order.orderId ? { ...o, status: newStatus } : o)));
                         } catch (err) {
                           alert("Gagal mengubah status order.");
                         }
