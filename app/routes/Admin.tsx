@@ -29,6 +29,14 @@ interface OrderAdmin {
   orderDate: string;
 }
 
+const ORDER_STATUSES = [
+  "PENDING",
+  "PROCESSING",
+  "DELIVERED",
+  "COMPLETED",
+  "CANCELED",
+];
+
 function formatPrice(price: number) {
   return price.toLocaleString("id-ID", { style: "currency", currency: "IDR" });
 }
@@ -103,6 +111,15 @@ export default function Component() {
       alert("Failed to delete product: " + (err.response?.data?.message || err.message));
     }
   };
+
+  // Fungsi untuk update status order
+  async function updateOrderStatus(orderId: number, newStatus: string, token: string) {
+    await axios.put(
+      `http://localhost:8080/api/admin/orders/${orderId}/status?status=${newStatus}`,
+      {},
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -220,7 +237,32 @@ export default function Component() {
                   <div>{order.orderId}</div>
                   <div>{order.customerName}</div>
                   <div>{order.username}</div>
-                  <div>{order.status}</div>
+                  <div>
+                    <select
+                      className="border rounded px-2 py-1"
+                      value={order.status}
+                      onChange={async (e) => {
+                        const newStatus = e.target.value;
+                        const token = localStorage.getItem("token");
+                        try {
+                          await updateOrderStatus(order.orderId, newStatus, token!);
+                          setOrders((prev) =>
+                            prev.map((o) =>
+                              o.orderId === order.orderId ? { ...o, status: newStatus } : o
+                            )
+                          );
+                        } catch (err) {
+                          alert("Gagal mengubah status order.");
+                        }
+                      }}
+                    >
+                      {ORDER_STATUSES.map((status) => (
+                        <option key={status} value={status}>
+                          {status}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
                   <div>{formatPrice(order.totalPrice)}</div>
                   <div>{order.orderDate ? new Date(order.orderDate).toLocaleString() : ""}</div>
                 </div>
